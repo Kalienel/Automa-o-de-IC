@@ -1,0 +1,144 @@
+from geopy.geocoders import Nominatim
+import json
+from selenium import webdriver
+
+api = 'CHAVE CENSURADA'
+
+loc = input("Insira o local: ")
+raio = input("Insira o raio de busca em metros(no máximo 50000): ")
+while int(raio) > 50000:
+    raio = input("Insira um raio menor que 50000 metros: ")
+
+print('accounting','\n',
+'airport','\n',
+'amusement_park','\n',
+'aquarium','\n',
+'art_gallery','\n',
+'atm','\n',
+'bakery','\n',
+'bank','\n',
+'bar','\n',
+'beauty_salon','\n',
+'bicycle_store','\n',
+'book_store','\n',
+'bowling_alley','\n',
+'bus_station','\n',
+'cafe','\n',
+'campground','\n',
+'car_dealer','\n',
+'car_rental','\n',
+'car_repair','\n',
+'car_wash','\n',
+'casino','\n',
+'cemetery','\n',
+'church','\n',
+'city_hall','\n',
+'clothing_store','\n',
+'convenience_store','\n',
+'courthouse','\n',
+'dentist','\n',
+'department_store','\n',
+'doctor','\n',
+'electrician','\n',
+'electronics_store','\n',
+'embassy','\n',
+'fire_station','\n',
+'florist','\n',
+'funeral_home','\n',
+'furniture_store','\n',
+'gas_station','\n',
+'gym','\n',
+'hair_care','\n',
+'hardware_store','\n',
+'hindu_temple','\n',
+'home_goods_store','\n',
+'hospital','\n',
+'insurance_agency','\n',
+'jewelry_store','\n',
+'laundry','\n',
+'lawyer','\n',
+'library','\n',
+'liquor_store','\n',
+'local_government_office','\n',
+'locksmith','\n',
+'lodging','\n',
+'meal_delivery','\n',
+'meal_takeaway','\n',
+'mosque','\n',
+'movie_rental','\n',
+'movie_theater','\n',
+'moving_company','\n',
+'museum','\n',
+'night_club','\n',
+'painter','\n',
+'park','\n',
+'parking','\n',
+'pet_store','\n',
+'pharmacy','\n',
+'physiotherapist','\n',
+'plumber','\n',
+'police','\n',
+'post_office','\n',
+'real_estate_agency','\n',
+'restaurant','\n',
+'roofing_contractor','\n',
+'rv_park','\n',
+'school','\n',
+'shoe_store','\n',
+'shopping_mall','\n',
+'spa','\n',
+'stadium','\n',
+'storage','\n',
+'store','\n',
+'subway_station','\n',
+'supermarket','\n',
+'synagogue','\n',
+'taxi_stand','\n',
+'train_station','\n',
+'transit_station','\n',
+'travel_agency','\n',
+'veterinary_care','\n',
+'zoo')
+print("Escolha um tipo de estabelecimento (DIGITE EXATAMENTE): ")
+
+tipo = input()
+geolocator = Nominatim(user_agent="OpenStreetMap")
+location = geolocator.geocode(loc)
+kw = input("Insira uma palavra chave: ")
+
+url = "https://maps.googleapis.com/maps/api/place/nearbysearch/json?location=" +str(location.latitude) + "," + str(location.longitude) + "&radius=" + raio + "&type=" + tipo + "&keyword=" + kw + "&key=" + api
+#url = "http://headers.jsontest.com/"
+
+browser = webdriver.Chrome()
+body = browser.find_element_by_tag_name('body')
+browser.get(url)
+body = browser.find_element_by_tag_name('body')
+text = body.text
+data = json.loads(text)
+
+
+
+with open("ICcontatos.json","w") as outfile:
+    json.dump(data, outfile)
+
+with open("ICcontatos.json") as js:
+    j = json.load(js)
+    js.close()
+
+browser = webdriver.Chrome()
+body = browser.find_element_by_tag_name('body')
+
+num = len(j["results"])
+for i in j["results"]:
+    q = i["name"]
+    e = i["vicinity"]
+    q = q.replace(' ','+')
+    e = e.replace(' ','+')
+    
+    print("Número de contatos: ")
+    print(num)
+    browser.get("https://www.google.com/search?q="+q+" "+e)
+    temp = input("Pressione ENTER para buscar o CNPJ")
+    browser.get("https://www.google.com/search?q="+q+" CNPJ"+" "+e)
+    temp = input("Pressione ENTER para o próximo local")
+    num = num -1
